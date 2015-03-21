@@ -2,6 +2,8 @@ package parser
 
 import "encoding/xml"
 
+type Model interface {}
+
 type EVEAPI struct {
     XMLName xml.Name `xml:"eveapi"`
     Time string `xml:"currentTime"`
@@ -25,4 +27,19 @@ type Skill struct {
 type SkillQueue struct {
     EVEAPI
     Skill []Skill `xml:"result>rowset>row"`
+}
+
+type GroupSkill struct {
+    Name string `xml:"typeName,attr"`
+}
+
+type Group struct {
+    Name string `xml:"groupName,attr"`
+    Skill []GroupSkill `xml:"rowset>row"`
+}
+
+type Tree struct {
+    Model
+    EVEAPI
+    Group []Group `xml:"result>rowset>row"`
 }

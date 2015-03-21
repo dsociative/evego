@@ -32,6 +32,7 @@ func ReadConfig() Config {
 func main() {
     config := ReadConfig()
     api := api.New(config.Code, config.ID)
+    fmt.Println(api.SkillTree())
     characters := api.Characters()
     fmt.Println(characters)
     for _, char := range characters.Character {

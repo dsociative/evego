@@ -2,7 +2,6 @@ package api
 
 import "net/http"
 import "net/url"
-// import "fmt"
 import "evego/parser"
 import "io/ioutil"
 
@@ -21,6 +20,14 @@ func (api *API) Request(urlPrefix string, values url.Values) []byte {
     } else {
         panic(err)
     }
+}
+
+func (api *API) Do(urlPrefix string, values url.Values, parseFunc func (raw []byte) parser.Model) parser.Model {
+    return parseFunc(api.Request(urlPrefix, values))
+}
+
+func (api *API) SkillTree() parser.Tree {
+    return api.Do("/eve/SkillTree.xml.aspx", url.Values{}, parser.ParseSkillTree).(parser.Tree)
 }
 
 func (api *API) Characters()  parser.Characters {
