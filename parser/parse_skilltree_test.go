@@ -47,7 +47,7 @@ const SkillTreeRaw = `<?xml version='1.0' encoding='UTF-8'?>
 
 
 func TestParseSkillTree(t *testing.T) {
-    tree := ParseSkillTree([]byte(SkillTreeRaw))
+    tree := ParseSkillTree([]byte(SkillTreeRaw)).(Tree)
     group := []Group{Group{Name:"Corporation Management", Skill:[]GroupSkill{GroupSkill{Name:"Anchoring"}, GroupSkill{Name:"CFO Training"}}}}
     assert.Equal(t, tree.Group, group)
 }

@@ -1,8 +1,8 @@
 package main
 
 import (
-    "evego/parser"
     "testing"
+    "github.com/dsociative/evego/parser"
 )
 
 const SkillTreeRaw = `<?xml version='1.0' encoding='UTF-8'?>

@@ -1,7 +1,7 @@
 package main
 
 import (
-    "evego/api"
+    "github.com/dsociative/evego/api"
     "fmt"
     "os"
     "encoding/json"

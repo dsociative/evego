@@ -2,8 +2,8 @@ package api
 
 import "net/http"
 import "net/url"
-import "evego/parser"
 import "io/ioutil"
+import "github.com/dsociative/evego/parser"
 
 type API struct {
     vcode string
