@@ -22,5 +22,5 @@ const CharactersRaw = `<?xml version='1.0' encoding='UTF-8'?>
 
 func TestParseCharacters(t *testing.T) {
     characters := ParseCharacters([]byte(CharactersRaw))
-    assert.Equal(t, characters.Character[1], Character{Name:"DISSNET", CharacterID:"129943370", CorporationName:"Worst Player Ever."})
+    assert.Equal(t, characters[1], Character{Name:"DISSNET", CharacterID:"129943370", CorporationName:"Worst Player Ever."})
 }

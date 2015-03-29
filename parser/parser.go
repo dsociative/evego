@@ -10,13 +10,13 @@ func Parse(raw []byte, model Model) {
     }
 }
 
-func ParseCharacters(raw []byte) Characters {
+func ParseCharacters(raw []byte) []Character {
     characters := Characters{}
     err := xml.Unmarshal(raw, &characters)
     if err != nil {
         fmt.Printf("error: %v", err)
     }
-    return characters
+    return characters.Character
 }
 
 func ParseSkillQueue(raw []byte) SkillQueue {

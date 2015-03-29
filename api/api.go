@@ -5,6 +5,10 @@ import "net/url"
 import "io/ioutil"
 import "github.com/dsociative/evego/parser"
 
+type APIFace interface {
+    Characters() []parser.Character
+}
+
 type API struct {
     vcode string
     keyid string
@@ -30,7 +34,7 @@ func (api *API) SkillTree() parser.Tree {
     return api.Do("/eve/SkillTree.xml.aspx", url.Values{}, parser.ParseSkillTree).(parser.Tree)
 }
 
-func (api *API) Characters()  parser.Characters {
+func (api *API) Characters() []parser.Character {
     values := url.Values{"keyID": {api.keyid}, "vCode": {api.vcode}}
     return parser.ParseCharacters(api.Request("/account/Characters.xml.aspx", values))
 }
