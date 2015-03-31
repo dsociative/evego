@@ -31,17 +31,27 @@ func (api *API) Do(urlPrefix string, values url.Values, parseFunc func (raw []by
 }
 
 func (api *API) SkillTree() parser.Tree {
-    return api.Do("/eve/SkillTree.xml.aspx", url.Values{}, parser.ParseSkillTree).(parser.Tree)
+    return api.Do(
+        "/eve/SkillTree.xml.aspx", url.Values{}, parser.ParseSkillTree,
+    ).(parser.Tree)
 }
 
 func (api *API) Characters() []parser.Character {
     values := url.Values{"keyID": {api.keyid}, "vCode": {api.vcode}}
-    return parser.ParseCharacters(api.Request("/account/Characters.xml.aspx", values))
+    return parser.ParseCharacters(
+        api.Request("/account/Characters.xml.aspx", values),
+    )
 }
 
 func (api *API) Queue(character *parser.Character) parser.SkillQueue {
-    values := url.Values{"keyID": {api.keyid}, "vCode": {api.vcode}, "characterID": {character.CharacterID}}
-    return parser.ParseSkillQueue(api.Request("/char/SkillQueue.xml.aspx", values))
+    values := url.Values{
+        "keyID": {api.keyid},
+        "vCode": {api.vcode},
+        "characterID": {character.CharacterID},
+    }
+    return parser.ParseSkillQueue(
+        api.Request("/char/SkillQueue.xml.aspx", values),
+    )
 }
 
 func New(vcode string, keyid string) API {

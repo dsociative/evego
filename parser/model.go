@@ -1,8 +1,13 @@
 package parser
 
-import "encoding/xml"
+import (
+    "encoding/xml"
+    "gopkg.in/mgo.v2/bson"
+)
 
-type Model interface {}
+type Model interface {
+    FormKey() bson.M
+}
 
 type EVEAPI struct {
     XMLName xml.Name `xml:"eveapi"`
@@ -15,7 +20,12 @@ type Character struct {
     CorporationName string `xml:"corporationName,attr"`
 }
 
+func (c Character) FormKey() bson.M {
+    return bson.M{"characterid": c.CharacterID}
+}
+
 type Characters struct {
+    Model
     EVEAPI
     Character []Character `xml:"result>rowset>row"`
 }
@@ -26,7 +36,12 @@ type Skill struct {
 
 type SkillQueue struct {
     EVEAPI
+    CharacterID string
     Skill []Skill `xml:"result>rowset>row"`
+}
+
+func (c SkillQueue) FormKey() bson.M {
+    return bson.M{"characterid": c.CharacterID}
 }
 
 type GroupSkill struct {

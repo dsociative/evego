@@ -35,7 +35,7 @@ func main() {
     fmt.Println(api.SkillTree())
     characters := api.Characters()
     fmt.Println(characters)
-    for _, char := range characters.Character {
+    for _, char := range characters {
         fmt.Println(char.Name, api.Queue(&char))
     }
 }
