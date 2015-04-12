@@ -1,8 +1,8 @@
 package main
 
 import (
-    "testing"
-    "github.com/dsociative/evego/parser"
+	"github.com/dsociative/evego/api"
+	"testing"
 )
 
 const SkillTreeRaw = `<?xml version='1.0' encoding='UTF-8'?>
@@ -45,7 +45,7 @@ const SkillTreeRaw = `<?xml version='1.0' encoding='UTF-8'?>
 </eveapi>`
 
 func BenchmarkParser10000000(b *testing.B) {
-    for n := 0; n < b.N; n++ {
-        parser.ParseSkillTree([]byte(SkillTreeRaw))
-    }
+	for n := 0; n < b.N; n++ {
+		api.ParseSkillTree([]byte(SkillTreeRaw))
+	}
 }

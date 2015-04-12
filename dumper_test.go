@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/dsociative/evego/parser"
+	"github.com/dsociative/evego/api"
 	"github.com/stretchr/testify/suite"
 
 	"gopkg.in/mgo.v2"
@@ -25,68 +25,68 @@ type DumperTests struct {
 func (s *BaseTests) SetupTest() {
 	s.session, s.db = DialTestDB()
 
-	s.dumper = New(s.db)
+	s.dumper = DumperNew(s.db)
 	s.characters = s.dumper.characters
 	s.queue = s.dumper.queue
 	s.db.DropDatabase()
 
 }
 
-func (s *BaseTests) GetAllCharacters() []parser.Character {
-	var characters []parser.Character
+func (s *BaseTests) GetAllCharacters() []api.Character {
+	var characters []api.Character
 	iter := s.characters.Find(nil).Iter()
 	iter.All(&characters)
 	return characters
 }
 
-func (s *BaseTests) GetAllQueue() []parser.SkillQueue {
-	var model []parser.SkillQueue
+func (s *BaseTests) GetAllQueue() []api.SkillQueue {
+	var model []api.SkillQueue
 	iter := s.queue.Find(nil).Iter()
 	iter.All(&model)
 	return model
 }
 
 func (s *DumperTests) TestCharacters() {
-	data := []parser.Character{
-		parser.Character{Name: "DISSNET", CharacterID: "123"},
-		parser.Character{Name: "DISSTORG", CharacterID: "345"},
+	data := []api.Character{
+		api.Character{Name: "DISSNET", CharacterID: "123"},
+		api.Character{Name: "DISSTORG", CharacterID: "345"},
 	}
 	s.Equal(nil, s.dumper.Characters(data...))
 	s.Equal(data, s.GetAllCharacters())
 }
 
 func (s *DumperTests) TestCharacterUpdate() {
-	data := []parser.Character{
-		parser.Character{Name: "DISSNET", CharacterID: "123"},
-		parser.Character{Name: "DISSTORG", CharacterID: "142"},
+	data := []api.Character{
+		api.Character{Name: "DISSNET", CharacterID: "123"},
+		api.Character{Name: "DISSTORG", CharacterID: "142"},
 	}
 	s.dumper.Characters(data...)
-	s.dumper.Characters(parser.Character{Name: "NewNick", CharacterID: "142"})
+	s.dumper.Characters(api.Character{Name: "NewNick", CharacterID: "142"})
 
-	s.Equal([]parser.Character{
-		parser.Character{Name: "DISSNET", CharacterID: "123"},
-		parser.Character{Name: "NewNick", CharacterID: "142"},
+	s.Equal([]api.Character{
+		api.Character{Name: "DISSNET", CharacterID: "123"},
+		api.Character{Name: "NewNick", CharacterID: "142"},
 	}, s.GetAllCharacters())
 }
 
 func (s *DumperTests) TestSkillQueue() {
-	data := parser.SkillQueue{
+	data := api.SkillQueue{
 		CharacterID: "123",
-		Skill: []parser.Skill{
-			parser.Skill{TypeID: 32},
+		Skill: []api.Skill{
+			api.Skill{TypeID: 32},
 		},
 	}
 	dumpAndCheck := func() {
 		s.dumper.Queue(data)
-		s.Equal([]parser.SkillQueue{data}, s.GetAllQueue())
+		s.Equal([]api.SkillQueue{data}, s.GetAllQueue())
 	}
 
 	dumpAndCheck()
 
-	data.Skill = append(data.Skill, parser.Skill{TypeID: 99})
+	data.Skill = append(data.Skill, api.Skill{TypeID: 99})
 	dumpAndCheck()
 
-	data.Skill = []parser.Skill{}
+	data.Skill = []api.Skill{}
 	dumpAndCheck()
 }
 

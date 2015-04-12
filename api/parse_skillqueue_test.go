@@ -1,8 +1,8 @@
-package parser
+package api
 
 import (
-    "testing"
-    "github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 const SkillQueueRaw = `<?xml version='1.0' encoding='UTF-8'?>
@@ -17,10 +17,8 @@ const SkillQueueRaw = `<?xml version='1.0' encoding='UTF-8'?>
   <cachedUntil>2009-03-18 13:34:43</cachedUntil>
 </eveapi>`
 
-
-
 func TestParseSkillQueue(t *testing.T) {
-    queue := ParseSkillQueue([]byte(SkillQueueRaw))
-    skills := []Skill{Skill{TypeID: 11441}, Skill{TypeID: 20533}}
-    assert.Equal(t, queue.Skill, skills)
+	queue := ParseSkillQueue([]byte(SkillQueueRaw))
+	skills := []Skill{Skill{TypeID: 11441}, Skill{TypeID: 20533}}
+	assert.Equal(t, queue.Skill, skills)
 }

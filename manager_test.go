@@ -4,7 +4,7 @@ import (
 	"github.com/stretchr/testify/suite"
 	"testing"
 	// "gopkg.in/mgo.v2"
-	. "github.com/dsociative/evego/parser"
+	. "github.com/dsociative/evego/api"
 )
 
 type ManagerTests struct {

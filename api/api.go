@@ -3,10 +3,9 @@ package api
 import "net/http"
 import "net/url"
 import "io/ioutil"
-import "github.com/dsociative/evego/parser"
 
 type APIFace interface {
-	Characters() []parser.Character
+	Characters() []Character
 }
 
 type API struct {
@@ -26,30 +25,30 @@ func (api *API) Request(urlPrefix string, values url.Values) []byte {
 	}
 }
 
-func (api *API) Do(urlPrefix string, values url.Values, parseFunc func(raw []byte) parser.Model) parser.Model {
+func (api *API) Do(urlPrefix string, values url.Values, parseFunc func(raw []byte) Model) Model {
 	return parseFunc(api.Request(urlPrefix, values))
 }
 
-func (api *API) SkillTree() parser.Tree {
+func (api *API) SkillTree() Tree {
 	return api.Do(
-		"/eve/SkillTree.xml.aspx", url.Values{}, parser.ParseSkillTree,
-	).(parser.Tree)
+		"/eve/SkillTree.xml.aspx", url.Values{}, ParseSkillTree,
+	).(Tree)
 }
 
-func (api API) Characters() []parser.Character {
+func (api API) Characters() []Character {
 	values := url.Values{"keyID": {api.keyid}, "vCode": {api.vcode}}
-	return parser.ParseCharacters(
+	return ParseCharacters(
 		api.Request("/account/Characters.xml.aspx", values),
 	)
 }
 
-func (api *API) Queue(character *parser.Character) parser.SkillQueue {
+func (api *API) Queue(character *Character) SkillQueue {
 	values := url.Values{
 		"keyID":       {api.keyid},
 		"vCode":       {api.vcode},
 		"characterID": {character.CharacterID},
 	}
-	return parser.ParseSkillQueue(
+	return ParseSkillQueue(
 		api.Request("/char/SkillQueue.xml.aspx", values),
 	)
 }

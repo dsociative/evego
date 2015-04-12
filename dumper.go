@@ -1,8 +1,7 @@
 package main
 
 import (
-	// "fmt"
-	"github.com/dsociative/evego/parser"
+	"github.com/dsociative/evego/api"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
@@ -13,7 +12,7 @@ type Dumper struct {
 	queue      *mgo.Collection
 }
 
-func (d *Dumper) Dump(collection *mgo.Collection, key bson.M, model parser.Model) error {
+func (d *Dumper) Dump(collection *mgo.Collection, key bson.M, model api.Model) error {
 	err := collection.Update(key, model)
 	if err == mgo.ErrNotFound {
 		return collection.Insert(model)
@@ -21,7 +20,7 @@ func (d *Dumper) Dump(collection *mgo.Collection, key bson.M, model parser.Model
 	return err
 }
 
-func (d *Dumper) Characters(characters ...parser.Character) error {
+func (d *Dumper) Characters(characters ...api.Character) error {
 	for _, character := range characters {
 		err := d.Dump(d.characters, character.FormKey(), character)
 		if err != nil {
@@ -31,11 +30,11 @@ func (d *Dumper) Characters(characters ...parser.Character) error {
 	return nil
 }
 
-func (d *Dumper) Queue(queue parser.SkillQueue) error {
+func (d *Dumper) Queue(queue api.SkillQueue) error {
 	return d.Dump(d.queue, queue.FormKey(), queue)
 }
 
-func New(db *mgo.Database) Dumper {
+func DumperNew(db *mgo.Database) Dumper {
 	return Dumper{
 		db:         db,
 		characters: db.C("characters"),

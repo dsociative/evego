@@ -1,4 +1,4 @@
-package parser
+package api
 
 import (
 	"github.com/stretchr/testify/assert"
@@ -20,6 +20,5 @@ const CharactersRaw = `<?xml version='1.0' encoding='UTF-8'?>
 
 func TestParseCharacters(t *testing.T) {
 	characters := ParseCharacters([]byte(CharactersRaw))
-	assert.Equal(1, 2)
 	assert.Equal(t, characters[1], Character{Name: "DISSNET", CharacterID: "129943370", CorporationName: "Worst Player Ever."})
 }

@@ -1,8 +1,8 @@
-package parser
+package api
 
 import (
-    "testing"
-    "github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/assert"
+	"testing"
 )
 
 const SkillTreeRaw = `<?xml version='1.0' encoding='UTF-8'?>
@@ -44,14 +44,12 @@ const SkillTreeRaw = `<?xml version='1.0' encoding='UTF-8'?>
   <cachedUntil>2007-12-23 21:51:40</cachedUntil>
 </eveapi>`
 
-
-
 func TestParseSkillTree(t *testing.T) {
-    tree := ParseSkillTree([]byte(SkillTreeRaw)).(Tree)
-    group := []Group{Group{Name:"Corporation Management", Skill:[]GroupSkill{GroupSkill{Name:"Anchoring"}, GroupSkill{Name:"CFO Training"}}}}
-    assert.Equal(t, tree.Group, group)
+	tree := ParseSkillTree([]byte(SkillTreeRaw)).(Tree)
+	group := []Group{Group{Name: "Corporation Management", Skill: []GroupSkill{GroupSkill{Name: "Anchoring"}, GroupSkill{Name: "CFO Training"}}}}
+	assert.Equal(t, tree.Group, group)
 }
 
 func BenchmarkParser(b *testing.B) {
-    ParseSkillTree([]byte(SkillTreeRaw))
+	ParseSkillTree([]byte(SkillTreeRaw))
 }

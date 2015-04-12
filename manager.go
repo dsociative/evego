@@ -10,7 +10,7 @@ type Manager struct {
 }
 
 func ManagerNew(db *mgo.Database) Manager {
-	return Manager{dumper: New(db)}
+	return Manager{dumper: DumperNew(db)}
 }
 
 func (m *Manager) Process(apies ...api.APIFace) {

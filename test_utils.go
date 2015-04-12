@@ -1,15 +1,15 @@
 package main
 
 import (
-	"github.com/dsociative/evego/parser"
+	"github.com/dsociative/evego/api"
 	"gopkg.in/mgo.v2"
 )
 
 type FakeApi struct {
-	CharactersData []parser.Character
+	CharactersData []api.Character
 }
 
-func (api FakeApi) Characters() []parser.Character {
+func (api FakeApi) Characters() []api.Character {
 	return api.CharactersData
 }
 
