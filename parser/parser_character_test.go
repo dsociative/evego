@@ -1,10 +1,9 @@
 package parser
 
 import (
-    "testing"
-    "github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/assert"
+	"testing"
 )
-
 
 const CharactersRaw = `<?xml version='1.0' encoding='UTF-8'?>
 <eveapi version="2">
@@ -19,8 +18,8 @@ const CharactersRaw = `<?xml version='1.0' encoding='UTF-8'?>
   <cachedUntil>2015-03-19 09:55:07</cachedUntil>
 </eveapi>`
 
-
 func TestParseCharacters(t *testing.T) {
-    characters := ParseCharacters([]byte(CharactersRaw))
-    assert.Equal(t, characters[1], Character{Name:"DISSNET", CharacterID:"129943370", CorporationName:"Worst Player Ever."})
+	characters := ParseCharacters([]byte(CharactersRaw))
+	assert.Equal(1, 2)
+	assert.Equal(t, characters[1], Character{Name: "DISSNET", CharacterID: "129943370", CorporationName: "Worst Player Ever."})
 }

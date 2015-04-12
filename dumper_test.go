@@ -1,105 +1,111 @@
 package main
 
 import (
-    "testing"
-    "github.com/stretchr/testify/suite"
+	"github.com/stretchr/testify/suite"
+	"testing"
 
-    "gopkg.in/mgo.v2"
-    // "gopkg.in/mgo.v2/bson"
+	"gopkg.in/mgo.v2"
+	// "gopkg.in/mgo.v2/bson"
 
-    "github.com/dsociative/evego/parser"
+	"github.com/dsociative/evego/parser"
 )
 
-
 type FakeApi struct {
-    CharactersData []parser.Character
+	CharactersData []parser.Character
 }
 
-func (api FakeApi) Characters() []parser.Character {
-    return api.CharactersData
+func (api FakeApi) Chracters() []parser.Character {
+	return api.CharactersData
+}
+
+type BaseTests struct {
+	suite.Suite
+	session    *mgo.Session
+	characters *mgo.Collection
+	queue      *mgo.Collection
+	db         *mgo.Database
+	dumper     Dumper
 }
 
 type DumperTests struct {
-    suite.Suite
-    session *mgo.Session
-    characters *mgo.Collection
-    db *mgo.Database
-    dumper Dumper
+	BaseTests
 }
 
-func (s *DumperTests) SetupTest() {
-    session, err := mgo.Dial("localhost")
-    if err != nil {
-        panic(err)
-    }
-    s.session = session
-    s.db = session.DB("test")
+func (s *BaseTests) SetupTest() {
+	session, err := mgo.Dial("localhost")
+	if err != nil {
+		panic(err)
+	}
+	s.session = session
+	s.db = session.DB("test")
 
-    s.dumper = New(s.db)
+	s.dumper = New(s.db)
+	s.characters = s.dumper.characters
+	s.queue = s.dumper.queue
 }
 
-func (s *DumperTests) TearDownTest() {
-    s.db.DropDatabase()
+func (s *BaseTests) TearDownTest() {
+	s.db.DropDatabase()
 }
 
-func (s *DumperTests) GetAllCharacters() []parser.Character {
-    var characters []parser.Character
-    iter := s.dumper.characters.Find(nil).Iter()
-    iter.All(&characters)
-    return characters
+func (s *BaseTests) GetAllCharacters() []parser.Character {
+	var characters []parser.Character
+	iter := s.characters.Find(nil).Iter()
+	iter.All(&characters)
+	return characters
 }
 
-func (s *DumperTests) GetAllQueue() []parser.SkillQueue {
-    var model []parser.SkillQueue
-    iter := s.dumper.queue.Find(nil).Iter()
-    iter.All(&model)
-    return model
+func (s *BaseTests) GetAllQueue() []parser.SkillQueue {
+	var model []parser.SkillQueue
+	iter := s.queue.Find(nil).Iter()
+	iter.All(&model)
+	return model
 }
 
 func (s *DumperTests) TestCharacters() {
-    data := []parser.Character{
-        parser.Character{Name: "DISSNET", CharacterID: "123"},
-        parser.Character{Name: "DISSTORG", CharacterID: "345"},
-    }
-    s.Equal(nil, s.dumper.Characters(data...))
-    s.Equal(data, s.GetAllCharacters())
+	data := []parser.Character{
+		parser.Character{Name: "DISSNET", CharacterID: "123"},
+		parser.Character{Name: "DISSTORG", CharacterID: "345"},
+	}
+	s.Equal(nil, s.dumper.Characters(data...))
+	s.Equal(data, s.GetAllCharacters())
 }
 
 func (s *DumperTests) TestCharacterUpdate() {
-    data := []parser.Character{
-        parser.Character{Name: "DISSNET", CharacterID: "123"},
-        parser.Character{Name: "DISSTORG", CharacterID: "142"},
-    }
-    s.dumper.Characters(data...)
-    s.dumper.Characters(parser.Character{Name: "NewNick", CharacterID: "142"})
+	data := []parser.Character{
+		parser.Character{Name: "DISSNET", CharacterID: "123"},
+		parser.Character{Name: "DISSTORG", CharacterID: "142"},
+	}
+	s.dumper.Characters(data...)
+	s.dumper.Characters(parser.Character{Name: "NewNick", CharacterID: "142"})
 
-    s.Equal(s.GetAllCharacters(), []parser.Character{
-        parser.Character{Name: "DISSNET", CharacterID: "123"},
-        parser.Character{Name: "NewNick", CharacterID: "142"},
-    })
+	s.Equal([]parser.Character{
+		parser.Character{Name: "DISSNET", CharacterID: "123"},
+		parser.Character{Name: "NewNick", CharacterID: "142"},
+	}, s.GetAllCharacters())
 }
 
 func (s *DumperTests) TestSkillQueue() {
-    data := parser.SkillQueue{
-        CharacterID: "123",
-        Skill: []parser.Skill{
-            parser.Skill{TypeID: 32},
-        },
-    }
-    dumpAndCheck := func() {
-        s.dumper.Queue(data)
-        s.Equal([]parser.SkillQueue{data}, s.GetAllQueue())
-    }
+	data := parser.SkillQueue{
+		CharacterID: "123",
+		Skill: []parser.Skill{
+			parser.Skill{TypeID: 32},
+		},
+	}
+	dumpAndCheck := func() {
+		s.dumper.Queue(data)
+		s.Equal([]parser.SkillQueue{data}, s.GetAllQueue())
+	}
 
-    dumpAndCheck()
+	dumpAndCheck()
 
-    data.Skill = append(data.Skill, parser.Skill{TypeID: 99})
-    dumpAndCheck()
+	data.Skill = append(data.Skill, parser.Skill{TypeID: 99})
+	dumpAndCheck()
 
-    data.Skill = []parser.Skill{}
-    dumpAndCheck()
+	data.Skill = []parser.Skill{}
+	dumpAndCheck()
 }
 
 func TestDumperTests(t *testing.T) {
-    suite.Run(t, new(DumperTests))
+	suite.Run(t, new(DumperTests))
 }
