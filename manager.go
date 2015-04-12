@@ -1,19 +1,20 @@
 package main
 
 import (
-    "github.com/dsociative/evego/api"
-    "gopkg.in/mgo.v2"
+	"github.com/dsociative/evego/api"
+	"gopkg.in/mgo.v2"
 )
 
-
 type Manager struct {
-
+	dumper Dumper
 }
 
 func ManagerNew(db *mgo.Database) Manager {
-    return Manager{}
+	return Manager{dumper: New(db)}
 }
 
-func (m *Manager) Process(ap ...api.APIFace) {
-
+func (m *Manager) Process(apies ...api.APIFace) {
+	for _, api := range apies {
+		m.dumper.Characters(api.Characters()...)
+	}
 }

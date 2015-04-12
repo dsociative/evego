@@ -1,22 +1,13 @@
 package main
 
 import (
+	"github.com/dsociative/evego/parser"
 	"github.com/stretchr/testify/suite"
-	"testing"
 
 	"gopkg.in/mgo.v2"
-	// "gopkg.in/mgo.v2/bson"
 
-	"github.com/dsociative/evego/parser"
+	"testing"
 )
-
-type FakeApi struct {
-	CharactersData []parser.Character
-}
-
-func (api FakeApi) Chracters() []parser.Character {
-	return api.CharactersData
-}
 
 type BaseTests struct {
 	suite.Suite
@@ -32,20 +23,13 @@ type DumperTests struct {
 }
 
 func (s *BaseTests) SetupTest() {
-	session, err := mgo.Dial("localhost")
-	if err != nil {
-		panic(err)
-	}
-	s.session = session
-	s.db = session.DB("test")
+	s.session, s.db = DialTestDB()
 
 	s.dumper = New(s.db)
 	s.characters = s.dumper.characters
 	s.queue = s.dumper.queue
-}
-
-func (s *BaseTests) TearDownTest() {
 	s.db.DropDatabase()
+
 }
 
 func (s *BaseTests) GetAllCharacters() []parser.Character {

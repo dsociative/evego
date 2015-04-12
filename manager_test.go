@@ -1,28 +1,32 @@
 package main
 
-// import (
-//     "testing"
-//     "github.com/stretchr/testify/suite"
-//     // "gopkg.in/mgo.v2"
-//     // "github.com/dsociative/evego/parser"
-// )
+import (
+	"github.com/stretchr/testify/suite"
+	"testing"
+	// "gopkg.in/mgo.v2"
+	. "github.com/dsociative/evego/parser"
+)
 
+type ManagerTests struct {
+	DumperTests
+	manager Manager
+}
 
-// type ManagerTests struct {
-//     DumperTests
+func (s *ManagerTests) SetupTest() {
+	s.DumperTests.SetupTest()
+	s.manager = ManagerNew(s.DumperTests.db)
+}
 
-//     manager Manager
-// }
+func (s *ManagerTests) TestProcess() {
+	data := []Character{
+		Character{Name: "DISSNET", CharacterID: "1"},
+	}
+	api := FakeApi{CharactersData: data}
+	s.manager.Process(api)
 
-// func (s *ManagerTests) SetupTest() {
-//     s.manager = ManagerNew(s.db)
-// }
+	s.Equal(data, s.DumperTests.GetAllCharacters())
+}
 
-// func (s *ManagerTests) TestProcess() {
-//     api := FakeApi{}
-//     s.manager.Process(api)
-// }
-
-// func TestManagerTests(t *testing.T) {
-//     suite.Run(t, new(ManagerTests))
-// }
+func TestManagerTests(t *testing.T) {
+	suite.Run(t, new(ManagerTests))
+}
