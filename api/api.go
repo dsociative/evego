@@ -1,11 +1,21 @@
 package api
 
-import "net/http"
-import "net/url"
-import "io/ioutil"
+import (
+	"io/ioutil"
+	"net/http"
+	"net/url"
+)
+
+const (
+	HOST       = "https://api.eveonline.com"
+	TREE       = "/eve/SkillTree.xml.aspx"
+	CHARACTERS = "/account/Characters.xml.aspx"
+	QUEUE      = "/char/SkillQueue.xml.aspx"
+	KILLS      = "/char/KillLog.xml.aspx"
+)
 
 type APIFace interface {
-	Characters() []Character
+	Characters() ([]Character, error)
 }
 
 type API struct {
@@ -13,44 +23,58 @@ type API struct {
 	keyid string
 }
 
-func (api *API) Request(urlPrefix string, values url.Values) []byte {
-	api_host := "https://api.eveonline.com"
-	resp, err := http.PostForm(api_host+urlPrefix, values)
-	if err == nil {
+func (api *API) Request(urlPrefix string, values url.Values, model Model) (err error) {
+	var resp *http.Response
+
+	if resp, err = http.PostForm(HOST+urlPrefix, values); err == nil {
 		defer resp.Body.Close()
-		body, _ := ioutil.ReadAll(resp.Body)
-		return body
-	} else {
-		panic(err)
+		var body []byte
+		if body, err = ioutil.ReadAll(resp.Body); err == nil {
+			err = Parse(body, model)
+		}
 	}
+	return err
 }
 
-func (api *API) Do(urlPrefix string, values url.Values, parseFunc func(raw []byte) Model) Model {
-	return parseFunc(api.Request(urlPrefix, values))
+func (api *API) SkillTree() (tree Tree, err error) {
+	err = api.Request(TREE, url.Values{}, &tree)
+	return tree, err
 }
 
-func (api *API) SkillTree() Tree {
-	return api.Do(
-		"/eve/SkillTree.xml.aspx", url.Values{}, ParseSkillTree,
-	).(Tree)
-}
-
-func (api API) Characters() []Character {
-	values := url.Values{"keyID": {api.keyid}, "vCode": {api.vcode}}
-	return ParseCharacters(
-		api.Request("/account/Characters.xml.aspx", values),
+func (api API) Characters() ([]Character, error) {
+	characters := Characters{}
+	err := api.Request(
+		CHARACTERS,
+		url.Values{"keyID": {api.keyid}, "vCode": {api.vcode}},
+		&characters,
 	)
+	return characters.Character, err
 }
 
-func (api *API) Queue(character *Character) SkillQueue {
-	values := url.Values{
-		"keyID":       {api.keyid},
-		"vCode":       {api.vcode},
-		"characterID": {character.CharacterID},
-	}
-	return ParseSkillQueue(
-		api.Request("/char/SkillQueue.xml.aspx", values),
+func (api *API) Queue(character *Character) (queue SkillQueue, err error) {
+	err = api.Request(
+		QUEUE,
+		url.Values{
+			"keyID":       {api.keyid},
+			"vCode":       {api.vcode},
+			"characterID": {character.CharacterID},
+		},
+		&queue,
 	)
+	return queue, err
+}
+
+func (api *API) KillLog(character *Character) (kills Kills, err error) {
+	err = api.Request(
+		KILLS,
+		url.Values{
+			"keyID":       {api.keyid},
+			"vCode":       {api.vcode},
+			"characterID": {character.CharacterID},
+		},
+		&kills,
+	)
+	return kills, err
 }
 
 func New(vcode string, keyid string) API {

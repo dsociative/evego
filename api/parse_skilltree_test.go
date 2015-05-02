@@ -45,11 +45,8 @@ const SkillTreeRaw = `<?xml version='1.0' encoding='UTF-8'?>
 </eveapi>`
 
 func TestParseSkillTree(t *testing.T) {
-	tree := ParseSkillTree([]byte(SkillTreeRaw)).(Tree)
+	tree := Tree{}
+	Parse([]byte(SkillTreeRaw), &tree)
 	group := []Group{Group{Name: "Corporation Management", Skill: []GroupSkill{GroupSkill{Name: "Anchoring"}, GroupSkill{Name: "CFO Training"}}}}
 	assert.Equal(t, tree.Group, group)
-}
-
-func BenchmarkParser(b *testing.B) {
-	ParseSkillTree([]byte(SkillTreeRaw))
 }

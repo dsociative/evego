@@ -5,13 +5,31 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-type Model interface {
+type WithKey interface {
 	FormKey() bson.M
+}
+
+type Model interface {
+	GetError() APIError
+}
+
+type APIError struct {
+	Code string `xml:"code,attr"`
+	Msg  string `xml:",chardata"`
 }
 
 type EVEAPI struct {
 	XMLName xml.Name `xml:"eveapi"`
 	Time    string   `xml:"currentTime"`
+	Error   APIError `xml:"error"`
+}
+
+func (c EVEAPI) GetError() APIError {
+	return c.Error
+}
+
+func (c EVEAPI) FormKey() bson.M {
+	return bson.M{"characterid": "c.CharacterID"}
 }
 
 type Character struct {
@@ -25,7 +43,6 @@ func (c Character) FormKey() bson.M {
 }
 
 type Characters struct {
-	Model
 	EVEAPI
 	Character []Character `xml:"result>rowset>row"`
 }
@@ -54,7 +71,22 @@ type Group struct {
 }
 
 type Tree struct {
-	Model
 	EVEAPI
 	Group []Group `xml:"result>rowset>row"`
+}
+
+type Kills struct {
+	EVEAPI
+	Kills []Kill `xml:"result>rowset>row"`
+}
+
+type Kill struct {
+	Victim Victim `xml:"victim"`
+}
+
+type Victim struct {
+	Name            string `xml:"characterName,attr"`
+	CharacterID     string `xml:"characterID,attr"`
+	CorporationID   string `xml:"corporationID,attr"`
+	CorporationName string `xml:"corporationName,attr"`
 }

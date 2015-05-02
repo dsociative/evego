@@ -12,7 +12,7 @@ type Dumper struct {
 	queue      *mgo.Collection
 }
 
-func (d *Dumper) Dump(collection *mgo.Collection, key bson.M, model api.Model) error {
+func (d *Dumper) Dump(collection *mgo.Collection, key bson.M, model api.WithKey) error {
 	err := collection.Update(key, model)
 	if err == mgo.ErrNotFound {
 		return collection.Insert(model)

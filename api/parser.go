@@ -1,32 +1,18 @@
 package api
 
-import "encoding/xml"
-import "fmt"
+import (
+	"encoding/xml"
+	"errors"
+)
 
-func Parse(raw []byte, model Model) {
-	err := xml.Unmarshal(raw, &model)
-	if err != nil {
-		fmt.Printf("error: %v", err)
+func Parse(raw []byte, model Model) error {
+	var err error = xml.Unmarshal(raw, model)
+
+	if err == nil {
+		apiError := model.GetError()
+		if apiError.Code != "" {
+			err = errors.New("Api request error code:" + apiError.Code)
+		}
 	}
-}
-
-func ParseCharacters(raw []byte) []Character {
-	characters := Characters{}
-	err := xml.Unmarshal(raw, &characters)
-	if err != nil {
-		fmt.Printf("error: %v", err)
-	}
-	return characters.Character
-}
-
-func ParseSkillQueue(raw []byte) SkillQueue {
-	queue := SkillQueue{}
-	Parse(raw, &queue)
-	return queue
-}
-
-func ParseSkillTree(raw []byte) Model {
-	tree := Tree{}
-	Parse(raw, &tree)
-	return Tree(tree)
+	return err
 }

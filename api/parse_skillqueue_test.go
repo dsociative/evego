@@ -18,7 +18,8 @@ const SkillQueueRaw = `<?xml version='1.0' encoding='UTF-8'?>
 </eveapi>`
 
 func TestParseSkillQueue(t *testing.T) {
-	queue := ParseSkillQueue([]byte(SkillQueueRaw))
+	queue := SkillQueue{}
+	Parse([]byte(SkillQueueRaw), &queue)
 	skills := []Skill{Skill{TypeID: 11441}, Skill{TypeID: 20533}}
 	assert.Equal(t, queue.Skill, skills)
 }

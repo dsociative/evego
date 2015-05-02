@@ -15,6 +15,8 @@ func ManagerNew(db *mgo.Database) Manager {
 
 func (m *Manager) Process(apies ...api.APIFace) {
 	for _, api := range apies {
-		m.dumper.Characters(api.Characters()...)
+		if characters, err := api.Characters(); err == nil {
+			m.dumper.Characters(characters...)
+		}
 	}
 }

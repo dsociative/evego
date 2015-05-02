@@ -9,8 +9,8 @@ type FakeApi struct {
 	CharactersData []api.Character
 }
 
-func (api FakeApi) Characters() []api.Character {
-	return api.CharactersData
+func (api FakeApi) Characters() ([]api.Character, error) {
+	return api.CharactersData, nil
 }
 
 func DialTestDB() (*mgo.Session, *mgo.Database) {

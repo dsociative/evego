@@ -5,7 +5,14 @@ import (
 	"flag"
 	"fmt"
 	"github.com/dsociative/evego/api"
+	"log"
 	"os"
+)
+
+var (
+	print_data = flag.Bool("print", true, "print api data")
+	dump       = flag.Bool("dump", false, "dump api data to mongodb")
+	killlog    = flag.Bool("killlog", false, "killlog print")
 )
 
 type Config struct {
@@ -35,13 +42,32 @@ func GetApi() api.API {
 	return api.New(config.Code, config.ID)
 }
 
+func tryPrint(err error, d ...interface{}) {
+	if err != nil {
+		log.Fatal(err)
+	} else {
+		log.Println(d...)
+	}
+
+}
+
 func Print() {
 	api := GetApi()
 	fmt.Println(api.SkillTree())
-	characters := api.Characters()
-	fmt.Println(characters)
+	characters, err := api.Characters()
+	tryPrint(err, characters)
 	for _, char := range characters {
-		fmt.Println(char.Name, api.Queue(&char))
+		queue, err := api.Queue(&char)
+		tryPrint(err, char.Name, queue)
+
+		if *killlog {
+			kills, err := api.KillLog(&char)
+			if err != nil {
+				fmt.Println(err)
+			} else {
+				fmt.Println(kills)
+			}
+		}
 	}
 }
 
@@ -54,14 +80,13 @@ func Dump() {
 }
 
 func main() {
-	var print = flag.Bool("print", false, "print api data")
-	var dump = flag.Bool("dump", false, "dump api data")
 	flag.Parse()
 
-	if *print {
+	if *print_data {
 		Print()
 	}
 	if *dump {
 		Dump()
 	}
+
 }
