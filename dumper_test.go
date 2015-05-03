@@ -5,8 +5,20 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	"gopkg.in/mgo.v2"
-
 	"testing"
+)
+
+var (
+	killsExample = []api.Kill{
+		api.Kill{
+			KillID: "1",
+			Victim: api.Victim{Name: "Victim1", CharacterID: "1", CorporationID: "1", CorporationName: "Corp1"},
+		},
+		api.Kill{
+			KillID: "2",
+			Victim: api.Victim{Name: "Victim2", CharacterID: "2", CorporationID: "2", CorporationName: "Corp2"},
+		},
+	}
 )
 
 type BaseTests struct {
@@ -88,6 +100,17 @@ func (s *DumperTests) TestSkillQueue() {
 
 	data.Skill = []api.Skill{}
 	dumpAndCheck()
+}
+
+func (s *BaseTests) GetAllKills() (kills []api.Kill) {
+	iter := s.dumper.kills.Find(nil).Iter()
+	iter.All(&kills)
+	return
+}
+
+func (s *DumperTests) TestKills() {
+	s.dumper.Kills(api.Kills{Kills: killsExample})
+	s.Equal(killsExample, s.GetAllKills())
 }
 
 func TestDumperTests(t *testing.T) {

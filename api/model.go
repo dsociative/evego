@@ -9,8 +9,16 @@ type WithKey interface {
 	FormKey() bson.M
 }
 
+type WithItems interface {
+	Items() []WithKey
+}
+
 type Model interface {
 	GetError() APIError
+}
+
+type ModelStore struct {
+	Kills []WithKey
 }
 
 type APIError struct {
@@ -26,10 +34,6 @@ type EVEAPI struct {
 
 func (c EVEAPI) GetError() APIError {
 	return c.Error
-}
-
-func (c EVEAPI) FormKey() bson.M {
-	return bson.M{"characterid": "c.CharacterID"}
 }
 
 type Character struct {
@@ -77,11 +81,25 @@ type Tree struct {
 
 type Kills struct {
 	EVEAPI
+	ModelStore
 	Kills []Kill `xml:"result>rowset>row"`
 }
 
 type Kill struct {
+	KillID string `xml:"killID,attr"`
 	Victim Victim `xml:"victim"`
+}
+
+func (k Kills) Items() []WithKey {
+	var items []WithKey = []WithKey{}
+	for _, kill := range k.Kills {
+		items = append(items, WithKey(kill))
+	}
+	return items
+}
+
+func (c Kill) FormKey() bson.M {
+	return bson.M{"killid": c.KillID}
 }
 
 type Victim struct {

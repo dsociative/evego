@@ -18,13 +18,20 @@ func (s *ManagerTests) SetupTest() {
 }
 
 func (s *ManagerTests) TestProcess() {
-	data := []Character{
+	charactes := []Character{
 		Character{Name: "DISSNET", CharacterID: "1"},
 	}
-	api := FakeApi{CharactersData: data}
+
+	kills := Kills{Kills: killsExample}
+
+	api := FakeApi{
+		CharactersData: charactes,
+		KillsData:      kills,
+	}
 	s.manager.Process(api)
 
-	s.Equal(data, s.DumperTests.GetAllCharacters())
+	s.Equal(charactes, s.DumperTests.GetAllCharacters())
+	s.Equal(kills.Kills, s.DumperTests.GetAllKills())
 }
 
 func TestManagerTests(t *testing.T) {

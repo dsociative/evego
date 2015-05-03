@@ -16,6 +16,7 @@ const (
 
 type APIFace interface {
 	Characters() ([]Character, error)
+	KillLog(*Character) (Kills, error)
 }
 
 type API struct {
@@ -64,7 +65,7 @@ func (api *API) Queue(character *Character) (queue SkillQueue, err error) {
 	return queue, err
 }
 
-func (api *API) KillLog(character *Character) (kills Kills, err error) {
+func (api API) KillLog(character *Character) (kills Kills, err error) {
 	err = api.Request(
 		KILLS,
 		url.Values{
